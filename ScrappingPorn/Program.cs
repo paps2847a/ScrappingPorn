@@ -9,8 +9,7 @@ namespace ScrappingPorn
 
         static async Task Main(string[] args)
         {
-            var path = new PathHandler();
-            var imgControl = new ImageDownloader(path);
+            var imgControl = new ImageDownloader(new PathHandler());
 
             Print("Bienvenido animal de mierda que deseas hacer?");
             Print("");
@@ -48,27 +47,27 @@ namespace ScrappingPorn
                     switch(valuePath)
                     {
                         case 1:
-                            if (path.CreatePathFile())
+                            if (imgControl.CreatPath())
                             {
                                 Print("Path Creado");
                                 Print("");
                             }
                             break;
                         case 2:
-                            if (path.GetPath() == string.Empty)
+                            if (imgControl.GetStrPath() == string.Empty)
                             {
                                 Print("O no existe el archivo o no tiene nada dentro, imbecil");
                                 Print("");
                             }
                             else
                             {
-                                Print($"DIRECCION DE PATH: {path.GetPath()}");
+                                Print($"DIRECCION DE PATH: {imgControl.GetStrPath()}");
                                 Print("");
                             }
                             break;
                         case 3:
                             Print("Pon la direccion base en donde quieres crear las carpetas con tus cochinadas, procura poner solo la direccion base:");
-                            if (path.SavePath(Console.ReadLine()) != string.Empty)
+                            if (imgControl.SavPath(Console.ReadLine()) != string.Empty)
                             {
                                 Print("Direccion Creada");
                                 Print("");
@@ -137,6 +136,34 @@ namespace ScrappingPorn
             _pathHandler = pathHandler;
         }
 
+        public string GetStrPath() => _pathHandler.GetPath();
+
+        public string SavPath(string? path)
+        {
+            try
+            {
+               var r = _pathHandler.SavePath(path);
+               return r;
+            }
+            catch(Exception e)
+            {
+                return string.Empty;
+            }
+        }
+
+        public bool CreatPath()
+        {
+            try
+            {
+                return _pathHandler.CreatePathFile();
+            }
+            catch(Exception ex)
+            {
+                return false;
+            }
+        }
+
+
         public async Task<bool> DownlaodImgs(string urlToDownload, string carpeta, int minRange, int maxRange)
         {
             try
@@ -174,6 +201,8 @@ namespace ScrappingPorn
 
     public interface IPathHandler
     {
+        string SavePath(string? path);
+        bool CreatePathFile();
         string GetPath();
     }
     public class PathHandler : IPathHandler
