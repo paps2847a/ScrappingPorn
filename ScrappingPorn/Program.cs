@@ -170,11 +170,14 @@ namespace ScrappingPorn
             {
                 //var urlBase = "https://m9.imhentai.xxx/028/ox1ve25iar/";
                 var descargas = new List<Task>();
+
+                if (_pathHandler.GetPath() == string.Empty || _pathHandler.GetPath() == null)
+                    return false;
+
                 if (!Directory.Exists($"{_pathHandler.GetPath()}\\{carpeta}"))
                     Directory.CreateDirectory($"{_pathHandler.GetPath()}\\{carpeta}");
 
                 var builder = new StringBuilder($"{_pathHandler.GetPath()}\\{carpeta}");
-
                 for (var init = minRange; init < maxRange; ++init)
                 {
                     var rawData = await _client.GetStreamAsync($"{urlToDownload}{init}.jpg");
