@@ -10,7 +10,6 @@ namespace ScrappingPorn
         static async Task Main(string[] args)
         {
             var imgControl = new ImageDownloader(new PathHandler());
-
             Print("Bienvenido animal de mierda que deseas hacer?");
             Print("");
             Print("");
@@ -92,7 +91,7 @@ namespace ScrappingPorn
                     try
                     {
                         if (rawData == null || rawData.Length != 4)
-                            throw new Exception("Problema de data");
+                            throw new Exception("Problema al insertar los datos");
 
                         var polnoResult = await imgControl.DownlaodImgs(rawData[0], rawData[1], int.Parse(rawData[2]), int.Parse(rawData[3]));
                         if(polnoResult)
@@ -110,7 +109,7 @@ namespace ScrappingPorn
                         }
                     }
                     catch (Exception e) {
-                        Print("Hubo un problema con los datos que diste");
+                        Print(e.Message);
                     }
                 }
 
@@ -170,6 +169,9 @@ namespace ScrappingPorn
             {
                 //var urlBase = "https://m9.imhentai.xxx/028/ox1ve25iar/";
                 var descargas = new List<Task>();
+
+                if(minRange == 0 || maxRange == 0)
+                    return false;
 
                 if (_pathHandler.GetPath() == string.Empty || _pathHandler.GetPath() == null)
                     return false;
