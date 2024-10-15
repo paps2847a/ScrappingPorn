@@ -6,7 +6,6 @@ namespace ScrappingPorn
     internal class Program
     {
         public static Action<Object> Print = (Object x) => Console.WriteLine(x);
-
         static async Task Main(string[] args)
         {
             var imgControl = new ImageDownloader(new PathHandler());
@@ -134,9 +133,7 @@ namespace ScrappingPorn
             _client = new HttpClient();
             _pathHandler = pathHandler;
         }
-
         public string GetStrPath() => _pathHandler.GetPath();
-
         public string SavPath(string? path)
         {
             try
@@ -144,7 +141,7 @@ namespace ScrappingPorn
                var r = _pathHandler.SavePath(path);
                return r;
             }
-            catch(Exception e)
+            catch(Exception)
             {
                 return string.Empty;
             }
@@ -156,7 +153,7 @@ namespace ScrappingPorn
             {
                 return _pathHandler.CreatePathFile();
             }
-            catch(Exception ex)
+            catch(Exception)
             {
                 return false;
             }
@@ -169,21 +166,20 @@ namespace ScrappingPorn
             {
                 //var urlBase = "https://m9.imhentai.xxx/028/ox1ve25iar/";
                 var descargas = new List<Task>();
-
                 if(minRange == 0 || maxRange == 0)
                     return false;
 
                 if (_pathHandler.GetPath() == string.Empty || _pathHandler.GetPath() == null)
                     return false;
 
-                if (!Directory.Exists($"{_pathHandler.GetPath()}\\{carpeta}"))
-                    Directory.CreateDirectory($"{_pathHandler.GetPath()}\\{carpeta}");
+                if (!Directory.Exists(@$"{_pathHandler.GetPath()}\{carpeta}"))
+                    Directory.CreateDirectory(@$"{_pathHandler.GetPath()}\{carpeta}");
 
-                var builder = new StringBuilder($"{_pathHandler.GetPath()}\\{carpeta}");
+                var builder = new StringBuilder(@$"{_pathHandler.GetPath()}\{carpeta}");
                 for (var init = minRange; init < maxRange; ++init)
                 {
-                    var rawData = await _client.GetStreamAsync($"{urlToDownload}{init}.jpg");
-                    builder.Append($"\\{init}.jpg");
+                    var rawData = await _client.GetStreamAsync(@$"{urlToDownload}{init}.jpg");
+                    builder.Append(@$"\{init}.jpg");
 
                     var filestream = new FileStream(builder.ToString(), FileMode.Create);
                     descargas.Add(rawData.CopyToAsync(filestream));
@@ -194,7 +190,7 @@ namespace ScrappingPorn
                 await Task.WhenAll(descargas);
                 return true;
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 return false;
             }
@@ -211,7 +207,7 @@ namespace ScrappingPorn
     }
     public class PathHandler : IPathHandler
     {
-        private string AppContx = $"{AppContext.BaseDirectory}\\FilePATH\\direction.txt";
+        private string AppContx = @$"{AppContext.BaseDirectory}\FilePATH\direction.txt";
 
         public bool CreatePathFile()
         {
@@ -229,7 +225,7 @@ namespace ScrappingPorn
                 }
                 return true;
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 return false;
             }
@@ -258,25 +254,25 @@ namespace ScrappingPorn
             {
                 return File.ReadAllText(AppContx);
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 return string.Empty;
             }
         }
     }
 
-    public static class ExtensionFunctionsBuilder
+    public static class ExtensionFunctionsStringBuilder
     {
         public static String RemoveLastImage(this StringBuilder builder)
         {
             try
             {
-                var data = builder.ToString().Split("\\").ToList();
+                var data = builder.ToString().Split(@"\").ToList();
                 data.RemoveAt(data.Count - 1);
 
-                return String.Join("\\", data);
+                return String.Join(@"\", data);
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 return string.Empty;
             }
