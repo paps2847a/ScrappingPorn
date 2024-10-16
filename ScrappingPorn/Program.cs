@@ -183,6 +183,7 @@ namespace ScrappingPorn
 
                     var filestream = new FileStream(builder.ToString(), FileMode.Create);
                     descargas.Add(rawData.CopyToAsync(filestream));
+                    filestream.Close();
 
                     builder.Clear().Append(builder.RemoveLastImage());
                 }
