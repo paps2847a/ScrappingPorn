@@ -181,9 +181,8 @@ namespace ScrappingPorn
                     var rawData = await _client.GetStreamAsync(@$"{urlToDownload}{init}.jpg");
                     builder.Append(@$"\{init}.jpg");
 
-                    var filestream = new FileStream(builder.ToString(), FileMode.Create);
+                    var filestream = new FileStream(builder.ToString(), FileMode.Create, FileAccess.Write);
                     descargas.Add(rawData.CopyToAsync(filestream));
-                    filestream.Close();
 
                     builder.Clear().Append(builder.RemoveLastImage());
                 }
@@ -206,6 +205,7 @@ namespace ScrappingPorn
         bool CreatePathFile();
         string GetPath();
     }
+
     public class PathHandler : IPathHandler
     {
         private string AppContx = @$"{AppContext.BaseDirectory}\FilePATH\direction.txt";
