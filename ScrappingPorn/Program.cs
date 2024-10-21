@@ -50,6 +50,11 @@ namespace ScrappingPorn
                                 Print("Path Creado");
                                 Print("");
                             }
+                            else
+                            {
+                                Print("La direccion del archivo ya existe o hubo un problema, decifralo tu imbecil");
+                                Print("");
+                            }
                             break;
                         case 2:
                             if (imgControl.GetStrPath() == string.Empty)
@@ -59,7 +64,7 @@ namespace ScrappingPorn
                             }
                             else
                             {
-                                Print($"DIRECCION DE PATH: {imgControl.GetStrPath()}");
+                                Print($"DIRECCION GUARDADA DE PATH: {imgControl.GetStrPath()}");
                                 Print("");
                             }
                             break;
@@ -133,7 +138,9 @@ namespace ScrappingPorn
             _client = new HttpClient();
             _pathHandler = pathHandler;
         }
+
         public string GetStrPath() => _pathHandler.GetPath();
+
         public string SavPath(string? path)
         {
             try
@@ -214,15 +221,14 @@ namespace ScrappingPorn
         {
             try
             {
-                var pathAndFile = AppContx;
-                if (File.Exists(pathAndFile))
+                if (File.Exists(AppContx))
                 {
                     return false;
                 }
                 else
                 {
-                    File.Create(pathAndFile).Close();
-                    File.WriteAllText(pathAndFile, "aqui se sobreescribira con la direccion de guardado que quieras");
+                    File.Create(AppContx).Close();
+                    File.WriteAllText(AppContx, "aqui se sobreescribira con la direccion de guardado que quieras");
                 }
                 return true;
             }
@@ -253,7 +259,7 @@ namespace ScrappingPorn
         {
             try
             {
-                return File.ReadAllText(AppContx);
+                return new StreamReader(AppContx).ReadToEnd();
             }
             catch (Exception)
             {
