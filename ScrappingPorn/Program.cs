@@ -119,7 +119,9 @@ namespace ScrappingPorn
                         }
                         catch (Exception e)
                         {
+                            Print("");
                             Print(e.Message);
+                            Print("");
                         }
                     }
 
