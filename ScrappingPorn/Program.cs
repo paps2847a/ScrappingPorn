@@ -215,12 +215,15 @@ namespace ScrappingPorn
 
     public class PathHandler : IPathHandler
     {
-        private string AppContx = @$"{AppContext.BaseDirectory}\FilePATH\direction.txt";
+        private string AppContx = @$"{AppContext.BaseDirectory}FilePATH\direction.txt";
 
         public bool CreatePathFile()
         {
             try
             {
+                if (!Directory.Exists(@$"{AppContext.BaseDirectory}FilePATH"))
+                    Directory.CreateDirectory(@$"{AppContext.BaseDirectory}FilePATH");
+
                 if (File.Exists(AppContx))
                 {
                     return false;
