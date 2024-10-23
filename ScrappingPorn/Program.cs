@@ -105,7 +105,7 @@ namespace ScrappingPorn
                             if (rawData == null || rawData.Length != 4)
                                 throw new Exception("Problema al insertar los datos");
 
-                            if (rawData[1][rawData[1].Length - 1] != '/')
+                            if (rawData[0][rawData[1].Length - 1] != '/')
                                 throw new Exception("Te hace falta el / a lo ultimo de la direccion URL");
 
                             var polnoResult = await imgControl.DownlaodImgs(rawData[0], rawData[1], int.Parse(rawData[2]), int.Parse(rawData[3]));
