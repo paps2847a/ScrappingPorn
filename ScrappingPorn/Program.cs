@@ -209,7 +209,7 @@ namespace ScrappingPorn
                         var rawData = await _client.GetStreamAsync(@$"{urlToDownload}{init}.jpg");
                         builder.Append(@$"\{init}.jpg");
 
-                        var file = File.Create(builder.ToString());
+                        var file = new FileStream(builder.ToString(), FileMode.CreateNew, FileAccess.Write);
                         descargas.Add(rawData.CopyToAsync(file));
 
                         builder.RemoveLastImage();
@@ -217,11 +217,12 @@ namespace ScrappingPorn
                     catch(Exception ex)
                     {
                         ex.InformError();
+                        builder.RemoveLastImage();
                         continue;
                     }
                 }
 
-                await Task.WhenAll(descargas);
+                Task.WaitAll(descargas.ToArray);
                 return true;
             }
             catch (Exception ex)
