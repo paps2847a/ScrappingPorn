@@ -99,6 +99,9 @@ namespace ScrappingPorn
                             if (rawData == null || rawData.Length != 4)
                                 throw new Exception("Problema al insertar los datos");
 
+                            if (rawData[1][rawData[1].Length - 1] != '/')
+                                throw new Exception("Te hace falta el / a lo ultimo de la direccion URL");
+
                             var polnoResult = await imgControl.DownlaodImgs(rawData[0], rawData[1], int.Parse(rawData[2]), int.Parse(rawData[3]));
                             if (polnoResult)
                             {
@@ -193,13 +196,22 @@ namespace ScrappingPorn
                 var builder = new StringBuilder(@$"{_pathHandler.GetPath()}\{carpeta}");
                 for (var init = minRange; init <= maxRange; ++init)
                 {
-                    var rawData = await _client.GetStreamAsync(@$"{urlToDownload}{init}.jpg");
-                    builder.Append(@$"\{init}.jpg");
+                    try
+                    {
+                        var rawData = await _client.GetStreamAsync(@$"{urlToDownload}{init}.jpg");
+                        builder.Append(@$"\{init}.jpg");
+                        using (var filestream = new FileStream(builder.ToString(), FileMode.Create, FileAccess.Write))
+                        {
+                            descargas.Add(rawData.CopyToAsync(filestream));
+                        }
 
-                    var filestream = new FileStream(builder.ToString(), FileMode.Create, FileAccess.Write);
-                    descargas.Add(rawData.CopyToAsync(filestream));
-
-                    builder.RemoveLastImage();
+                        builder.RemoveLastImage();
+                    }
+                    catch(Exception ex)
+                    {
+                        ex.InformError();
+                        continue;
+                    }
                 }
 
                 await Task.WhenAll(descargas);
@@ -210,8 +222,6 @@ namespace ScrappingPorn
                 return false;
             }
         } 
-
-
     }
 
     public interface IPathHandler
@@ -306,7 +316,7 @@ namespace ScrappingPorn
             if (!Directory.Exists(PathError))
                 Directory.CreateDirectory(PathError);
 
-            var fail = new FileStream($@"{PathError}/{DateTime.Now.ToString("yyyy-MM-dd")}-error.txt", FileMode.CreateNew, FileAccess.Write);
+            var fail = new FileStream($@"{PathError}/{DateTime.Now.ToString("yyyy-MM-dd")}-id:{Guid.NewGuid().ToString()}-error.txt", FileMode.CreateNew, FileAccess.Write);
             fail.Write(Encoding.UTF8.GetBytes($@"Error: {ex.Message}"));
             fail.Flush();
         }
