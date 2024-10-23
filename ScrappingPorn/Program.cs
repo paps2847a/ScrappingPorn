@@ -105,7 +105,7 @@ namespace ScrappingPorn
                             if (rawData == null || rawData.Length != 4)
                                 throw new Exception("Problema al insertar los datos");
 
-                            if (rawData[0][rawData[1].Length - 1] != '/')
+                            if (rawData[0][rawData[0].Length - 1] != '/')
                                 throw new Exception("Te hace falta el / a lo ultimo de la direccion URL");
 
                             var polnoResult = await imgControl.DownlaodImgs(rawData[0], rawData[1], int.Parse(rawData[2]), int.Parse(rawData[3]));
@@ -208,10 +208,9 @@ namespace ScrappingPorn
                     {
                         var rawData = await _client.GetStreamAsync(@$"{urlToDownload}{init}.jpg");
                         builder.Append(@$"\{init}.jpg");
-                        using (var filestream = new FileStream(builder.ToString(), FileMode.Create, FileAccess.Write))
-                        {
-                            descargas.Add(rawData.CopyToAsync(filestream));
-                        }
+
+                        var file = File.Create(builder.ToString());
+                        descargas.Add(rawData.CopyToAsync(file));
 
                         builder.RemoveLastImage();
                     }
@@ -225,8 +224,9 @@ namespace ScrappingPorn
                 await Task.WhenAll(descargas);
                 return true;
             }
-            catch (Exception)
+            catch (Exception ex)
             {
+                ex.InformError();
                 return false;
             }
         } 
