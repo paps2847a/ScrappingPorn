@@ -8,122 +8,130 @@ namespace ScrappingPorn
         public static Action<Object> Print = (Object x) => Console.WriteLine(x);
         static async Task Main(string[] args)
         {
-            var imgControl = new ImageDownloader(new PathHandler());
-            Print("Bienvenido animal de mierda que deseas hacer?");
-            Print("");
-            Print("");
-            Print("Opciones:");
-            Print("");
-
-            while (true)
+            try
             {
-                Print("1) Establecer direccion de guardado de imagenes");
-                Print("2) Descargar Imagenes");
-                Print("3) Cerrar Programa");
+                var imgControl = new ImageDownloader(new PathHandler());
+                Print("Bienvenido animal de mierda que deseas hacer?");
                 Print("");
-                var opcion = int.TryParse(Console.ReadLine(), out int value);
-                if (!opcion)
-                {
-                    Print("no es una opcion valida pendejo");
-                    continue;
-                }
+                Print("");
+                Print("Opciones:");
+                Print("");
 
-                if(value > 3 || value == 0)
+                while (true)
                 {
-                    Print("No hay opcion con ese numero imbecil");
-                    continue;
-                }
-
-                if(value == 1)
-                {
-                    Print("Estas son las opciones de manejo del destino de guardado, que quieres hacer?:");
-                    Print("1) Crear Path");
-                    Print("2) Ver Path");
-                    Print("3) Editar Path");
-
-                    var opcionPath = int.TryParse(Console.ReadLine(), out int valuePath);
-                    switch(valuePath)
+                    Print("1) Establecer direccion de guardado de imagenes");
+                    Print("2) Descargar Imagenes");
+                    Print("3) Cerrar Programa");
+                    Print("");
+                    var opcion = int.TryParse(Console.ReadLine(), out int value);
+                    if (!opcion)
                     {
-                        case 1:
-                            if (imgControl.CreatPath())
-                            {
-                                Print("Path Creado");
-                                Print("");
-                            }
-                            else
-                            {
-                                Print("La direccion del archivo ya existe o hubo un problema, decifralo tu imbecil");
-                                Print("");
-                            }
-                            break;
-                        case 2:
-                            if (imgControl.GetStrPath() == string.Empty)
-                            {
-                                Print("O no existe el archivo o no tiene nada dentro, imbecil");
-                                Print("");
-                            }
-                            else
-                            {
-                                Print($"DIRECCION GUARDADA DE PATH: {imgControl.GetStrPath()}");
-                                Print("");
-                            }
-                            break;
-                        case 3:
-                            Print("Pon la direccion base en donde quieres crear las carpetas con tus cochinadas, procura poner solo la direccion base:");
-                            if (imgControl.SavPath(Console.ReadLine()) != string.Empty)
-                            {
-                                Print("Direccion Creada");
-                                Print("");
-                            }
-                            else
-                            {
-                                Print("Hubo un error");
-                                Print("");
-                            }
-                            break;
-                        default:
-                            Print("No existe tal opcion");
-                            break;
+                        Print("no es una opcion valida pendejo");
+                        continue;
                     }
-                }
 
-                if(value == 2)
-                {
-                    Print("Hora de la accion nena");
-                    Print("Pon la URL del sitio, el nombre de la carpeta y el rango de imagenes que quieres. Todo separado por una coma ','");
-                    var rawData = Console.ReadLine()?.Split(",");
-                    try
+                    if (value > 3 || value == 0)
                     {
-                        if (rawData == null || rawData.Length != 4)
-                            throw new Exception("Problema al insertar los datos");
+                        Print("No hay opcion con ese numero imbecil");
+                        continue;
+                    }
 
-                        var polnoResult = await imgControl.DownlaodImgs(rawData[0], rawData[1], int.Parse(rawData[2]), int.Parse(rawData[3]));
-                        if(polnoResult)
+                    if (value == 1)
+                    {
+                        Print("Estas son las opciones de manejo del destino de guardado, que quieres hacer?:");
+                        Print("1) Crear Path");
+                        Print("2) Ver Path");
+                        Print("3) Editar Path");
+
+                        var opcionPath = int.TryParse(Console.ReadLine(), out int valuePath);
+                        switch (valuePath)
                         {
-                            Print("");
-                            Print("Hora de la paja");
-                            Print("");
-                        }
-                        else
-                        {
-                            Print("");
-                            Print("Hubo un problema...");
-                            Print("Noooo mi polnoooooo");
-                            Print("");
+                            case 1:
+                                if (imgControl.CreatPath())
+                                {
+                                    Print("Path Creado");
+                                    Print("");
+                                }
+                                else
+                                {
+                                    Print("La direccion del archivo ya existe o hubo un problema, decifralo tu imbecil");
+                                    Print("");
+                                }
+                                break;
+                            case 2:
+                                if (imgControl.GetStrPath() == string.Empty)
+                                {
+                                    Print("O no existe el archivo o no tiene nada dentro, imbecil");
+                                    Print("");
+                                }
+                                else
+                                {
+                                    Print($"DIRECCION GUARDADA DE PATH: {imgControl.GetStrPath()}");
+                                    Print("");
+                                }
+                                break;
+                            case 3:
+                                Print("Pon la direccion base en donde quieres crear las carpetas con tus cochinadas, procura poner solo la direccion base:");
+                                if (imgControl.SavPath(Console.ReadLine()) != string.Empty)
+                                {
+                                    Print("Direccion Creada");
+                                    Print("");
+                                }
+                                else
+                                {
+                                    Print("Hubo un error");
+                                    Print("");
+                                }
+                                break;
+                            default:
+                                Print("No existe tal opcion");
+                                break;
                         }
                     }
-                    catch (Exception e) {
-                        Print(e.Message);
+
+                    if (value == 2)
+                    {
+                        Print("Hora de la accion nena");
+                        Print("Pon la URL del sitio, el nombre de la carpeta y el rango de imagenes que quieres. Todo separado por una coma ','");
+                        var rawData = Console.ReadLine()?.Split(",");
+                        try
+                        {
+                            if (rawData == null || rawData.Length != 4)
+                                throw new Exception("Problema al insertar los datos");
+
+                            var polnoResult = await imgControl.DownlaodImgs(rawData[0], rawData[1], int.Parse(rawData[2]), int.Parse(rawData[3]));
+                            if (polnoResult)
+                            {
+                                Print("");
+                                Print("Hora de la paja");
+                                Print("");
+                            }
+                            else
+                            {
+                                Print("");
+                                Print("Hubo un problema...");
+                                Print("Noooo mi polnoooooo");
+                                Print("");
+                            }
+                        }
+                        catch (Exception e)
+                        {
+                            Print(e.Message);
+                        }
+                    }
+
+                    if (value == 3)
+                    {
+                        Print("Gracias por hacerme perder mi tiempo imbecil");
+                        Print("Presiona cualquier tecla para cerrar");
+                        Console.ReadLine();
+                        break;
                     }
                 }
-
-                if(value == 3)
-                {
-                    Print("Gracias por hacerme perder mi tiempo imbecil");
-                    Print("Presiona cualquier tecla para cerrar");
-                    Console.ReadLine();
-                    break;
-                }
+            }
+            catch(Exception ex)
+            {
+                ex.InformError();
             }
         }
     }
@@ -286,6 +294,21 @@ namespace ScrappingPorn
             {
                 return string.Empty;
             }
+        }
+    }
+
+    public static class ErrorInformerExtension
+    {
+        private static string PathError = $@"{AppContext.BaseDirectory}ErrorInformer";
+
+        public static void InformError(this Exception ex)
+        {
+            if (!Directory.Exists(PathError))
+                Directory.CreateDirectory(PathError);
+
+            var fail = new FileStream($@"{PathError}/{DateTime.Now.ToString("yyyyMMdd")}-error.txt", FileMode.CreateNew, FileAccess.Write);
+            fail.Write(Encoding.UTF8.GetBytes($@"Error: {ex.Message}"));
+            fail.Flush();
         }
     }
 }
