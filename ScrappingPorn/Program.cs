@@ -191,7 +191,7 @@ namespace ScrappingPorn
                     Directory.CreateDirectory(@$"{_pathHandler.GetPath()}\{carpeta}");
 
                 var builder = new StringBuilder(@$"{_pathHandler.GetPath()}\{carpeta}");
-                for (var init = minRange; init < maxRange; ++init)
+                for (var init = minRange; init <= maxRange; ++init)
                 {
                     var rawData = await _client.GetStreamAsync(@$"{urlToDownload}{init}.jpg");
                     builder.Append(@$"\{init}.jpg");
@@ -199,7 +199,7 @@ namespace ScrappingPorn
                     var filestream = new FileStream(builder.ToString(), FileMode.Create, FileAccess.Write);
                     descargas.Add(rawData.CopyToAsync(filestream));
 
-                    builder.Clear().Append(builder.RemoveLastImage());
+                    builder.RemoveLastImage();
                 }
 
                 await Task.WhenAll(descargas);
@@ -238,8 +238,10 @@ namespace ScrappingPorn
                 }
                 else
                 {
-                    File.Create(AppContx).Close();
-                    File.WriteAllText(AppContx, "aqui se sobreescribira con la direccion de guardado que quieras");
+                    using (var file = new FileStream(AppContx, FileMode.CreateNew, FileAccess.Write))
+                    {
+                        file.Write(Encoding.UTF8.GetBytes("aqui se sobreescribira con la direccion de guardado que quieras"));
+                    }
                 }
                 return true;
             }
@@ -253,11 +255,18 @@ namespace ScrappingPorn
         {
             try
             {
-                if (path == null)
+                if (string.IsNullOrEmpty(path))
                     return string.Empty;
 
-                File.Create(AppContx).Close();
-                File.WriteAllText(AppContx, path);
+                if (File.Exists(AppContx))
+                {
+                    File.WriteAllText(AppContx, path);
+                }
+                else
+                {
+                    return "No existe el archivo path";
+                }
+
                 return "exito";
             }
             catch (Exception ex)
@@ -270,7 +279,7 @@ namespace ScrappingPorn
         {
             try
             {
-                return new StreamReader(AppContx).ReadToEnd();
+                return File.ReadAllText(AppContx);
             }
             catch (Exception)
             {
@@ -281,19 +290,10 @@ namespace ScrappingPorn
 
     public static class ExtensionFunctionsStringBuilder
     {
-        public static String RemoveLastImage(this StringBuilder builder)
+        public static void RemoveLastImage(this StringBuilder builder)
         {
-            try
-            {
-                var data = builder.ToString().Split(@"\").ToList();
-                data.RemoveAt(data.Count - 1);
-
-                return String.Join(@"\", data);
-            }
-            catch (Exception)
-            {
-                return string.Empty;
-            }
+            var result = builder.ToString().Split(@"\").ToList().SkipLast(1);
+            builder.Clear().Append(String.Join(@"\", result));
         }
     }
 
