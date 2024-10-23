@@ -306,7 +306,7 @@ namespace ScrappingPorn
             if (!Directory.Exists(PathError))
                 Directory.CreateDirectory(PathError);
 
-            var fail = new FileStream($@"{PathError}/{DateTime.Now.ToString("yyyyMMdd")}-error.txt", FileMode.CreateNew, FileAccess.Write);
+            var fail = new FileStream($@"{PathError}/{DateTime.Now.ToString("yyyy-MM-dd")}-error.txt", FileMode.CreateNew, FileAccess.Write);
             fail.Write(Encoding.UTF8.GetBytes($@"Error: {ex.Message}"));
             fail.Flush();
         }
