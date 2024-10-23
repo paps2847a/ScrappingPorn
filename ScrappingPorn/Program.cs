@@ -91,6 +91,12 @@ namespace ScrappingPorn
 
                     if (value == 2)
                     {
+                        if(string.IsNullOrEmpty(imgControl.GetStrPath()))
+                        {
+                            Print("No puedes descargar nada si no tienes un path configurado!");
+                            continue;
+                        }
+
                         Print("Hora de la accion nena");
                         Print("Pon la URL del sitio, el nombre de la carpeta y el rango de imagenes que quieres. Todo separado por una coma ','");
                         var rawData = Console.ReadLine()?.Split(",");
