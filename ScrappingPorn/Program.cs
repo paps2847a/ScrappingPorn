@@ -191,7 +191,6 @@ namespace ScrappingPorn
             try
             {
                 //var urlBase = "https://m9.imhentai.xxx/028/ox1ve25iar/";
-                var descargas = new List<Task>();
                 if(minRange == 0 || maxRange == 0)
                     return false;
 
@@ -208,9 +207,10 @@ namespace ScrappingPorn
                     {
                         var rawData = await _client.GetStreamAsync(@$"{urlToDownload}{init}.jpg");
                         builder.Append(@$"\{init}.jpg");
-
-                        var file = new FileStream(builder.ToString(), FileMode.CreateNew, FileAccess.Write);
-                        descargas.Add(rawData.CopyToAsync(file));
+                        using (var file = new FileStream(builder.ToString(), FileMode.CreateNew, FileAccess.Write))
+                        {
+                            await rawData.CopyToAsync(file);
+                        }
 
                         builder.RemoveLastImage();
                     }
@@ -222,7 +222,6 @@ namespace ScrappingPorn
                     }
                 }
 
-                Task.WaitAll(descargas.ToArray);
                 return true;
             }
             catch (Exception ex)
