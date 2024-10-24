@@ -3,14 +3,14 @@ using System.Text;
 
 namespace ScrappingPorn
 {
-    internal class Program
+    public class Program
     {
-        public static Action<Object> Print = (Object x) => Console.WriteLine(x);
+        protected static Action<Object> Print = (Object x) => Console.WriteLine(x);
         static async Task Main(string[] args)
         {
             try
             {
-                var imgControl = new ImageDownloader(new PathHandler());
+                ImageDownloader imgControl = new ImageDownloader(new PathHandler());
                 Print("Bienvenido animal de mierda que deseas hacer?");
                 Print("");
                 Print("");
@@ -147,7 +147,7 @@ namespace ScrappingPorn
         }
     }
 
-    public class ImageDownloader
+    public class ImageDownloader : Program
     {
         private readonly HttpClient _client;
         private IPathHandler _pathHandler;
@@ -200,19 +200,18 @@ namespace ScrappingPorn
                 if (!Directory.Exists(@$"{_pathHandler.GetPath()}\{carpeta}"))
                     Directory.CreateDirectory(@$"{_pathHandler.GetPath()}\{carpeta}");
 
+                var downloadFiles = new List<Task<Stream>>();
                 var builder = new StringBuilder(@$"{_pathHandler.GetPath()}\{carpeta}");
+                int cuenta = 0;
+
+                Print("");
+                Print("Iniciando Descarga...");
+                Print("");
                 for (var init = minRange; init <= maxRange; ++init)
                 {
                     try
                     {
-                        var rawData = await _client.GetStreamAsync(@$"{urlToDownload}{init}.jpg");
-                        builder.Append(@$"\{init}.jpg");
-                        using (var file = new FileStream(builder.ToString(), FileMode.CreateNew, FileAccess.Write))
-                        {
-                            await rawData.CopyToAsync(file);
-                        }
-
-                        builder.RemoveLastImage();
+                        downloadFiles.Add(_client.GetStreamAsync(@$"{urlToDownload}{init}.jpg"));
                     }
                     catch(Exception ex)
                     {
@@ -222,6 +221,24 @@ namespace ScrappingPorn
                     }
                 }
 
+                var allFiles = await Task.WhenAll(downloadFiles);
+                Print("");
+                Print("Descarga terminada, guardando archivos...");
+                Print("");
+
+                Array.ForEach(allFiles, x =>
+                {
+                    builder.Append(@$"\{cuenta}.jpg");
+                    using (var file = new FileStream(builder.ToString(), FileMode.CreateNew, FileAccess.Write))
+                    {
+                        x.CopyTo(file);
+                    }
+
+                    builder.RemoveLastImage();
+                    cuenta++;
+                });
+
+                Print("Descargas terminadas sin ningun problema!.");
                 return true;
             }
             catch (Exception ex)
@@ -238,7 +255,6 @@ namespace ScrappingPorn
         bool CreatePathFile();
         string GetPath();
     }
-
     public class PathHandler : IPathHandler
     {
         private string AppContx = @$"{AppContext.BaseDirectory}FilePATH\direction.txt";
@@ -324,9 +340,10 @@ namespace ScrappingPorn
             if (!Directory.Exists(PathError))
                 Directory.CreateDirectory(PathError);
 
-            var fail = new FileStream($@"{PathError}/{DateTime.Now.ToString("yyyy-MM-dd")}-id:{Guid.NewGuid().ToString()}-error.txt", FileMode.CreateNew, FileAccess.Write);
+            var fail = new FileStream($@"{PathError}/{DateTime.Now.ToString("yyyy-MM-dd HH:mm")}-id:{Guid.NewGuid().ToString()}-error.txt", FileMode.CreateNew, FileAccess.Write);
             fail.Write(Encoding.UTF8.GetBytes($@"Error: {ex.Message}"));
             fail.Flush();
+            fail.Close();
         }
     }
 }
